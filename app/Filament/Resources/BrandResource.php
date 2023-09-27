@@ -4,8 +4,10 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\BrandResource\Pages;
 use App\Filament\Resources\BrandResource\RelationManagers;
+use Illuminate\Support\Str;
 use App\Models\Brand;
 use Filament\Forms;
+use Filament\Forms\Components\Group;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -27,7 +29,57 @@ class BrandResource extends Resource
     {
         return $form
             ->schema([
-                //
+               Forms\Components\Group::make()
+               ->schema([
+                Forms\Components\Section::make()
+                ->schema([
+                    Forms\Components\TextInput::make('name')
+                    ->required()
+                    ->live(onBlur: true)
+                    ->unique(Brand::class,'name',ignoreRecord: true)
+                    ->afterStateUpdated(function(string $operation, $state, Forms\Set $set){
+                            if ($operation !== 'create' ) {
+                                return;
+                            }
+
+                            $set('slug', Str::slug($state));    
+                    }),
+
+                    Forms\Components\TextInput::make('slug')
+                    ->disabled()
+                    ->dehydrated()
+                    ->required()
+                    ->unique(Brand::class,'slug', ignoreRecord: true),
+
+                    Forms\Components\TextInput::make('url')
+                    ->label('Website URL')
+                    ->required()
+                    ->columnSpan('full'),
+
+                    Forms\Components\MarkdownEditor::make('description')
+                    ->columnSpan('full'),
+                ])->columns(2)
+                ]),
+
+                Forms\Components\Group::make()
+                ->schema([
+                    Forms\Components\Section::make('Status')
+                    ->schema([
+                        Forms\Components\Toggle::make('is_visible')
+                        ->label('Visibility')
+                        ->helperText('Enable or Disable brand visibility')
+                        ->default(true)                         
+                    ]),
+
+                    Forms\Components\Group::make()
+                    ->schema([
+                        Forms\Components\Section::make('Color')
+                        ->schema([
+                            Forms\Components\ColorPicker::make('primary_hex')
+                            ->label('Primary Color')                      
+                        ]),
+                    ])
+                ])
             ]);
     }
 
@@ -66,7 +118,11 @@ class BrandResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make(),
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make()
+                ])
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
