@@ -5,6 +5,8 @@ namespace App\Providers\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
+use Filament\Navigation\NavigationItem;
 use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
@@ -29,6 +31,23 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->colors([
                 'primary' => Color::Blue,
+            ])
+            ->globalSearchKeyBindings(['command+k', 'ctrl+k'])
+            ->sidebarCollapsibleOnDesktop()
+            ->navigationItems([
+                NavigationItem::make('Github')
+                ->url('https://github.com/HesenovSahin/Filament_Php', shouldOpenInNewTab: true)
+                ->icon('heroicon-o-pencil-square')
+                ->group('Optinal links')
+                ->sort(2)
+            ])
+            // ->sidebarFullyCollapsibleOnDesktop() this is for default.
+            ->userMenuItems([
+                MenuItem::make()
+                ->label('Settings')
+                ->url('')
+                ->icon('heroicon-o-cog-6-tooth'),
+                'logout' =>MenuItem::make()->label('Log out')
             ])
             ->font('Poppins')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')

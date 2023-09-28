@@ -18,6 +18,7 @@ use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Ramsey\Uuid\Type\Integer;
 
@@ -30,6 +31,38 @@ class ProductResource extends Resource
     protected static ?int $navigationSort = 0;
 
     protected static ?string $navigationIcon = 'heroicon-o-bolt';
+
+    // value here should be name of the column but for multiple global we need to pass an array
+    //that  is why we need override it
+    protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['name','slug','description'];
+    }
+
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
+        // we can add multiple records
+        return [
+            'Brand' => $record->brand->name
+        ] ;
+    }
+
+    //eager loading for huge amount of records
+    public static function  getGlobalSearchEloquentQuery(): Builder
+    {
+        return parent::getGlobalSearchEloquentQuery()->with(['brand']);
+    }
+
+    // limiting the number of records
+    public static int $globalSearchResultsLimit = 20;
+
+    public static function getNavigationBadge(): ?string
+    {
+        //in here we can pass some string or any query
+        return static::getModel()::count();
+    }
 
     public static function form(Form $form): Form
     {

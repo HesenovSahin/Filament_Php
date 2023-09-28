@@ -27,6 +27,21 @@ class OrderResource extends Resource
 
     protected static ?string $navigationGroup = 'Shop';
 
+    // when we are doing this that column will not be visible on the navbar
+    // protected static bool $shouldRegisterNavigation = false;
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::where('status','processing')->count();
+    }
+
+    public static function getNavigationBadgeColor(): ?string
+    {
+        return static::getModel()::where('status','processing')->count() > 10
+        ? 'warning'
+        : 'primary';
+    }
+
     public static function form(Form $form): Form
     {
         return $form
