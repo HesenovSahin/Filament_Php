@@ -20,6 +20,6 @@ class Product extends Model
     }
 
     public function category() : BelongsToMany {
-        return $this->belongsToMany(Category::class)->withTimestamps();
+        return $this->belongsToMany(Category::class);
     }
 }

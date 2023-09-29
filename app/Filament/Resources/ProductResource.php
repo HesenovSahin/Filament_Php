@@ -149,6 +149,12 @@ class ProductResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('brand_id')
                         ->relationship('brand','name')
+                        ->required(),
+
+                        Forms\Components\Select::make('category')
+                        ->relationship('category','name')
+                        ->multiple()
+                        ->required()
                     ]),
                     ]),
                     
